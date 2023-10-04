@@ -1,29 +1,30 @@
 import {useEffect, useState} from 'react'
-import './App.css'
 import axios from "axios";
-import {Header} from "semantic-ui-react";
+import {Container} from "semantic-ui-react";
 import {Activity} from "../models/activity.ts";
+import NavBar from "./NavBar.tsx";
 
 function App() {
     const [activities, setActivities] = useState<Activity[]>([]);
     useEffect(() => {
         axios.get<Activity[]>('http://localhost:5000/api/activities')
             .then(response => {
-                console.log(response);
                 setActivities(response.data);
             });
     }, []);
 
-    
+
     return (
-        <div>
-            <Header as='h2' icon='users' content='Reactivities' />
-            <ul>
-                {activities.map((activity: Activity) => (
-                    <li key={activity.id}>{activity.title}</li>
-                ))}
-            </ul>
-        </div>
+        <>
+            <NavBar/>
+            <Container style={{marginTop: '7em'}}>
+                <ul>
+                    {activities.map((activity: Activity) => (
+                        <li key={activity.id}>{activity.title}</li>
+                    ))}
+                </ul>
+            </Container>
+        </>
     )
 }
 
