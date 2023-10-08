@@ -5,13 +5,15 @@ import {Activity} from "../../../app/models/activity.ts";
 interface Props {
     activity: Activity,
     cancelActivity: () => void,
-    selectActivity: (id: string) => void
+    selectActivity: (id: string) => void,
+    openForm: (id?:string) => void
 }
 
 export default function ActivityDetails(
     {
         activity,
         cancelActivity,
+        openForm
     }: Props
 ) {
     return (
@@ -26,7 +28,7 @@ export default function ActivityDetails(
             </Card.Content>
             <Card.Content extra>
                 <Button.Group widths='2'>
-                    <Button basic color='blue' content='Edit'/>
+                    <Button onClick={() => openForm(activity.id)} basic color='blue' content='Edit'/>
                     <Button onClick={cancelActivity} basic color='grey' content='Cancel'/>
                 </Button.Group>
             </Card.Content>
