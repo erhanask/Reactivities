@@ -8,12 +8,11 @@ import agent from "../api/agent.ts";
 import LoadingComponent from "./LoadingComponent.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store.ts";
-import {addActivity, deleteActivity, setActivities, updateActivity} from "../redux/ActivitySlice/ActivitySlice.ts";
+import {addActivity, deleteActivity, setActivities, updateActivity, setSelectedActivity} from "../redux/ActivitySlice/ActivitySlice.ts";
 
 function App() {
     const dispatch = useDispatch();
-    const {activities} = useSelector((state: RootState) => state.activity);
-    const [selectedActivity, setSelectedActivity] = useState<Activity | undefined>(undefined);
+    const {activities, selectedActivity} = useSelector((state: RootState) => state.activity);
     const [editMode, setEditMode] = useState(false);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -31,11 +30,11 @@ function App() {
     }, []);
 
     const handleSelectActivity = (id: string) => {
-        setSelectedActivity(activities.find(x => x.id === id));
+        dispatch(setSelectedActivity(id));
     }
 
     const handleCancelSelectActivity = () => {
-        setSelectedActivity(undefined);
+        dispatch(setSelectedActivity(undefined));
     }
 
     const handleFormOpen = (id?: string) => {
@@ -59,7 +58,7 @@ function App() {
                 dispatch(addActivity(activity));
             })
         }
-        setSelectedActivity(activity);
+        dispatch(setSelectedActivity(activity.id));
         setEditMode(false);
         setSubmitting(false);
     }
