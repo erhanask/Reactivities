@@ -6,9 +6,13 @@ import ActivityDashboard from "../../features/activities/dashboard/ActivityDashb
 import {v4 as uuid} from 'uuid';
 import agent from "../api/agent.ts";
 import LoadingComponent from "./LoadingComponent.tsx";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState} from "../redux/store.ts";
+import {addActivity, deleteActivity, setActivities, updateActivity} from "../redux/ActivitySlice/ActivitySlice.ts";
 
 function App() {
-    const [activities, setActivities] = useState<Activity[]>([]);
+    const dispatch = useDispatch();
+    const {activities} = useSelector((state: RootState) => state.activity);
     const [selectedActivity, setSelectedActivity] = useState<Activity | undefined>(undefined);
     const [editMode, setEditMode] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -16,12 +20,12 @@ function App() {
 
     useEffect(() => {
         agent.Activities.list().then(response => {
-            let activities: Activity[] = [];
+            const activityResponse: Activity[] = [];
             response.forEach(activity => {
                 activity.date = activity.date.split('T')[0];
-                activities.push(activity);
+                activityResponse.push(activity);
             })
-            setActivities(activities);
+            dispatch(setActivities(activityResponse));
             setLoading(false);
             });
     }, []);
@@ -47,13 +51,12 @@ function App() {
         setSubmitting(true);
         if (activity.id) {
             agent.Activities.update(activity).then(() => {
-                setActivities([...activities.filter(x => x.id !== activity.id), activity]);
+                dispatch(updateActivity(activity));
             })
         } else {
             activity.id = uuid();
             agent.Activities.create(activity).then(() => {
-                setActivities([...activities, activity]);
-
+                dispatch(addActivity(activity));
             })
         }
         setSelectedActivity(activity);
@@ -64,7 +67,7 @@ function App() {
     const handleDeleteActivity = (id: string) => {
         setSubmitting(true);
         agent.Activities.delete(id).then(() => {
-            setActivities([...activities.filter(x => x.id !== id)]);
+            dispatch(deleteActivity(id));
             setSubmitting(false);
         });
     }
