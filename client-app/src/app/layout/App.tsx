@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect} from 'react'
 import {Container} from "semantic-ui-react";
 import {Activity} from "../models/activity.ts";
 import NavBar from "./NavBar.tsx";
@@ -9,13 +9,12 @@ import LoadingComponent from "./LoadingComponent.tsx";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../redux/store.ts";
 import {addActivity, deleteActivity, setActivities, updateActivity, setSelectedActivity} from "../redux/ActivitySlice/ActivitySlice.ts";
+import {toggleMode} from "../redux/UiSlice/UiSlice.ts";
 
 function App() {
     const dispatch = useDispatch();
     const {activities, selectedActivity} = useSelector((state: RootState) => state.activity);
-    const [editMode, setEditMode] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [submitting, setSubmitting] = useState(false);
+    const {editMode, loading, submitting} = useSelector((state: RootState) => state.ui);
 
     useEffect(() => {
         agent.Activities.list().then(response => {
@@ -25,7 +24,10 @@ function App() {
                 activityResponse.push(activity);
             })
             dispatch(setActivities(activityResponse));
-            setLoading(false);
+            dispatch(toggleMode({
+                mode: 'loading',
+                status: false
+            }));
             });
     }, []);
 
@@ -39,15 +41,24 @@ function App() {
 
     const handleFormOpen = (id?: string) => {
         id ? handleSelectActivity(id) : handleCancelSelectActivity();
-        setEditMode(true);
+        dispatch(toggleMode({
+            mode: 'edit',
+            status: true
+        }));
     }
 
     const handleFormClose = () => {
-        setEditMode(false);
+        dispatch(toggleMode({
+            mode: 'edit',
+            status: false
+        }));
     }
 
     const handleCreateOrEditActivity = (activity: Activity) => {
-        setSubmitting(true);
+        dispatch(toggleMode({
+            mode: 'submitting',
+            status: true
+        }));
         if (activity.id) {
             agent.Activities.update(activity).then(() => {
                 dispatch(updateActivity(activity));
@@ -59,15 +70,27 @@ function App() {
             })
         }
         dispatch(setSelectedActivity(activity.id));
-        setEditMode(false);
-        setSubmitting(false);
+        dispatch(toggleMode({
+            mode: 'edit',
+            status: false
+        }));
+        dispatch(toggleMode({
+            mode: 'submitting',
+            status: false
+        }));
     }
 
     const handleDeleteActivity = (id: string) => {
-        setSubmitting(true);
+        dispatch(toggleMode({
+            mode: 'submitting',
+            status: true
+        }));
         agent.Activities.delete(id).then(() => {
             dispatch(deleteActivity(id));
-            setSubmitting(false);
+            dispatch(toggleMode({
+                mode: 'submitting',
+                status: false
+            }));
         });
     }
 

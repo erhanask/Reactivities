@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import activityReducer from './ActivitySlice/ActivitySlice';
+import uiReducer from './UiSlice/UiSlice';
 
 export const store = configureStore({
     reducer: {
         activity: activityReducer,
+        ui: uiReducer
     },
 })
 
