@@ -1,21 +1,24 @@
 ﻿import React from "react";
 import { Card,Image,Button } from "semantic-ui-react";
 import {Activity} from "../../../app/models/activity.ts";
+import {useDispatch} from "react-redux";
+import {setSelectedActivity} from "../../../app/redux/ActivitySlice/ActivitySlice.ts";
 
 interface Props {
     activity: Activity,
-    cancelActivity: () => void,
-    selectActivity: (id: string) => void,
     openForm: (id?:string) => void
 }
 
 export default function ActivityDetails(
     {
         activity,
-        cancelActivity,
         openForm
     }: Props
 ) {
+    const dispatch = useDispatch();
+    const cancelActivity = () => {
+        dispatch(setSelectedActivity(undefined));
+    }
     return (
         <Card fluid>
             <Image src={`/assets/categoryImages/${activity.category}.jpg`} wrapped ui={false} />
