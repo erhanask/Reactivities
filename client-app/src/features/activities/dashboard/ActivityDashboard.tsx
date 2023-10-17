@@ -1,6 +1,5 @@
 ﻿import React from "react";
 import {Grid} from "semantic-ui-react";
-import {Activity} from "../../../app/models/activity.ts";
 import ActivityList from "./ActivityList.tsx";
 import ActivityDetails from "../details/ActivityDetails.tsx";
 import {ActivityForm} from "../form/ActivityForm.tsx";
@@ -9,13 +8,11 @@ import {RootState} from "../../../app/redux/store.ts";
 
 
 interface Props {
-    activities: Activity[],
     openForm: (id?:string) => void,
 }
 
 export default function ActivityDashboard(
     {
-        activities,
         openForm,
     }: Props
 ) {
@@ -27,8 +24,7 @@ export default function ActivityDashboard(
         <Grid>
             <Grid.Column width='10'>
                 <ActivityList
-                    submitting={submitting}
-                    activities={activities}/>
+                    submitting={submitting}/>
             </Grid.Column>
             <Grid.Column width='6'>
                 {selectedActivity &&

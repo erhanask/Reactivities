@@ -1,19 +1,35 @@
-﻿import React from "react";
+﻿import React, {useEffect} from "react";
 import {Segment,Item,Button} from "semantic-ui-react";
 import {Activity} from "../../../app/models/activity.ts";
-import {deleteActivity, setSelectedActivity} from "../../../app/redux/ActivitySlice/ActivitySlice.ts";
-import {useDispatch} from "react-redux";
+import {deleteActivity, setActivities, setSelectedActivity} from "../../../app/redux/ActivitySlice/ActivitySlice.ts";
+import {useDispatch, useSelector} from "react-redux";
 import {toggleMode} from "../../../app/redux/UiSlice/UiSlice.ts";
 import agent from "../../../app/api/agent.ts";
+import {RootState} from "../../../app/redux/store.ts";
 
 interface Props {
-    activities: Activity[],
     submitting: boolean
 }
 
-export default function ActivityList({activities, submitting}: Props) {
+export default function ActivityList({submitting}: Props) {
     const dispatch = useDispatch();
     const [target,setTarget] = React.useState('');
+    const {activities} = useSelector((state: RootState) => state.activity);
+
+    useEffect(() => {
+        agent.Activities.list().then(response => {
+            const activityResponse: Activity[] = [];
+            response.forEach(activity => {
+                activity.date = activity.date.split('T')[0];
+                activityResponse.push(activity);
+            })
+            dispatch(setActivities(activityResponse));
+            dispatch(toggleMode({
+                mode: 'loading',
+                status: false
+            }));
+        });
+    }, []);
 
     function handleActivityDelete(e: React.MouseEvent<HTMLButtonElement, MouseEvent>,id: string) {
         setTarget(e.currentTarget.name);
